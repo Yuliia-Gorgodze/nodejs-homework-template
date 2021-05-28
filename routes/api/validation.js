@@ -1,35 +1,34 @@
 const Joi = require('joi')
-
+const regularNumber = /[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}/
+const regularName = /[A-Za-z]{1,}/
 const schemaCreateContact = Joi.object({
   name: Joi.string()
-    .pattern(/[A-Za-z]{1,}/)
+    .pattern(regularName)
     .min(2)
     .max(30)
     .required(),
 
   phone: Joi.string()
-    .pattern(/[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}/)
-    .min(14)
-    .max(14)
+    .pattern(regularNumber)
     .required(),
 
   email: Joi.string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'uk', 'gmail', 'yandex', 'mail', 'co'] },
+      tlds: { allow: ['com', 'net', 'gmail', 'mail'] },
     })
     .required(),
 })
 
 const schemaUpdateContact = Joi.object({
   name: Joi.string()
-    .pattern(/[A-Za-z]{1,}/)
+    .pattern(regularName)
     .min(2)
     .max(30)
     .optional(),
 
   phone: Joi.string()
-    .pattern(/[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}/)
+    .pattern(regularNumber)
     .min(14)
     .max(14)
     .optional(),
@@ -37,7 +36,7 @@ const schemaUpdateContact = Joi.object({
   email: Joi.string()
     .email({
       minDomainSegments: 2,
-      tlds: { allow: ['com', 'net', 'uk', 'gmail', 'yandex', 'mail', 'co'] },
+      tlds: { allow: ['com', 'net', 'gmail', 'mail'] },
     })
     .optional(),
 })
@@ -57,6 +56,7 @@ const validate = (shema, body, next) => {
 }
 
 module.exports.validateCreateContact = (req, _, next) => {
+  console.log(req.body)
   return validate(schemaCreateContact, req.body, next)
 }
 
