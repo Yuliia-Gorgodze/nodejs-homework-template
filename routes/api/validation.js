@@ -56,7 +56,6 @@ const validate = (shema, body, next) => {
 }
 
 module.exports.validateCreateContact = (req, _, next) => {
-  console.log(req.body)
   return validate(schemaCreateContact, req.body, next)
 }
 
