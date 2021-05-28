@@ -1,7 +1,6 @@
 const fs = require('fs/promises')
 const path = require('path')
 const shortid = require('shortid')
-const { readFile } = require('fs')
 
 const readData = async () => {
   const data = await fs.readFile(path.join(__dirname, 'contacts.json'), 'utf8')
