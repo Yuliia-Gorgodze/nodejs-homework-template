@@ -18,13 +18,10 @@ const getContactById = async (contactId) => {
 
 const removeContact = async (contactId) => {
   const data = await readData()
-  const index = data.findIndex(contact => String(contact.id) === contactId)
-  if (index !== -1) {
-    const result = data.splice(index, 1)
-    await fs.writeFile(path.join(__dirname, 'contacts.json'), JSON.stringify(data))
-    return result
-  }
-  return null
+  const result = await getContactById(contactId)
+  const index = data.filter(contact => String(contact.id) !== contactId)
+  await fs.writeFile(path.join(__dirname, 'contacts.json'), JSON.stringify(index))
+  return result
 }
 
 const addContact = async (body) => {
