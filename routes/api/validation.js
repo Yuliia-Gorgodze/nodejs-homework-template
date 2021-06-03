@@ -1,4 +1,5 @@
 const Joi = require('joi')
+const mongoose = require('mongoose')
 const regularNumber = /[(][0-9]{3}[)] [0-9]{3}-[0-9]{4}/
 const regularName = /[A-Za-z]{1,}/
 const schemaCreateContact = Joi.object({
@@ -61,4 +62,14 @@ module.exports.validateCreateContact = (req, _, next) => {
 
 module.exports.validateUpdateContact = (req, _, next) => {
   return validate(schemaUpdateContact, req.body, next)
+}
+
+module.exports.validateMongoId = (req, res, next) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return next({
+      status: 400,
+      message: 'Invalid ObjectId'
+    })
+  }
+  next()
 }
