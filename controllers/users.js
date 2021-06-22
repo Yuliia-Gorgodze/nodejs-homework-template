@@ -49,4 +49,18 @@ const logout = async (req, res, next) => {
     next(e)
   }
 }
-module.exports = { register, login, logout }
+const current = async (req, res, next) => {
+  try {
+    const { email, subscription, avatarURL } = req.user
+    return res
+      .status(HttpCode.OK)
+      .json({
+        status: 'success',
+        code: HttpCode.OK,
+        data: { email, subscription, avatarURL }
+      })
+  } catch (error) {
+    next(error)
+  }
+}
+module.exports = { register, login, logout, current }
