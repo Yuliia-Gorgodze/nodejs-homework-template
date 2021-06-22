@@ -1,19 +1,23 @@
 const Users = require('../repositories/users')
 const { HttpCode } = require('../helpers/constants')
 const jwt = require('jsonwebtoken')
+const path = require('path')
+const fs = require('fs/promises')
+const UploadAvatarService = require('../servises/local-upload')
 require('dotenv').config()
 const SECRET_KEY = process.env.SECRET_KEY
+
 const register = async (req, res, next) => {
   try {
     const user = await Users.findByEmail(req.body.email)
     if (user) {
       return res.status(HttpCode.CONFLICT).json({ status: 'error', code: HttpCode.CONFLICT, message: 'Email is already used' })
     }
-    const { id, name, email, gender } = await Users.create(req.body)
+    const { id, name, email, gender, avatar } = await Users.create(req.body)
     return res.status(HttpCode.CREATED).json({
       status: 'succes',
       code: HttpCode.CREATED,
-      data: { id, name, email, gender }
+      data: { id, name, email, gender, avatar }
     })
   } catch (e) {
     next(e)
@@ -49,4 +53,54 @@ const logout = async (req, res, next) => {
     next(e)
   }
 }
-module.exports = { register, login, logout }
+
+/* local upload */
+const avatars = async (req, res, next) => {
+  try {
+    const id = req.user.id
+    const uploads = new UploadAvatarService(process.env.AVATAR_OF_USERS)
+    const avatarUrl = await uploads.saveAvatar({ idUser: id, file: req.file })
+
+    try {
+      await fs.unlink(path.join(process.env.AVATAR_OF_USERS, req.user.avatar))
+    } catch (e) {
+      console.log(e.message)
+    }
+    await Users.updateAvatar(id, avatarUrl)
+      .res.json({ status: 'succes', code: 200, data: { avatarUrl } })
+  } catch (error) {
+    next(error)
+  }
+}
+// const avatars = async (req, res, next) => {
+//   try {
+//     const id = req.user.id
+//     const uploads = new UploadAvatarService()
+//     const { idCloudAvatar, avatarUrl } =
+//      await uploads.saveAvatar(
+//        req.file.path,
+//        req.user.idCloudAvatar,)
+
+//     await fs.unlink(req.file.path)
+//     await Users.updateAvatar(id, avatarUrl, idCloudAvatar)
+//       .res.json({ status: 'succes', code: 200, data: { avatarUrl } })
+//   } catch (error) {
+//     next(error)
+//   }
+// }
+const current = async (req, res, next) => {
+  try {
+    const { email, subscription, name } = req.user
+    return res
+      .status(HttpCode.OK)
+      .json({
+        status: 'success',
+        code: HttpCode.OK,
+        data: { email, subscription, name }
+      })
+  } catch (error) {
+    next(error)
+  }
+}
+
+module.exports = { register, login, logout, current, avatars }

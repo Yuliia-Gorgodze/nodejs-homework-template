@@ -1,14 +1,14 @@
 const { Schema, model } = require('mongoose')
+const gr = require('gravatar')
 const { Gender } = require('../helpers/constants')
 const bcrypt = require('bcryptjs')
 const SALT_WORK_FACTOR = 8
-const userSchema = new Schema({
-  name: { type: String, minlength: 2, default: 'Guest' },
 
-  age: {
-    type: Number,
-    min: 0,
-    max: 35
+const userSchema = new Schema({
+  name: {
+    type: String,
+    minlength: 2,
+    default: 'Guest'
   },
   gender: {
     type: String,
@@ -17,7 +17,7 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    required: true,
+    required: [true, 'Email is required'],
     unique: true,
     validate(value) {
       const re = /\S+@\S+\.\S+/g
@@ -26,11 +26,17 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: [true, 'Password is required'],
   },
   token: {
     type: String,
     default: null
+  },
+  avatar: {
+    type: String,
+    default: function () {
+      return gr.url(this.email, { s: '250' }, true)
+    }
   }
 }, {
   versionKey: false,

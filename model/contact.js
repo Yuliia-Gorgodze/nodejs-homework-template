@@ -1,17 +1,20 @@
 const { Schema, model, SchemaTypes } = require('mongoose')
 const mongoosePaginate = require('mongoose-paginate-v2')
 const contactSchema = new Schema({
-  name: String,
+  name: {
+    type: String,
+    required: [true, 'Set name for contact'],
+  },
   phone: String,
   email: String,
   isFavorite: {
     type: Boolean,
     default: false
   },
-  owner: { type: SchemaTypes.ObjectId, ref: 'users' },
-  features: {
-    type: Array,
-    set: (data) => (!data ? [] : data)
+  owner: { type: SchemaTypes.ObjectId, ref: 'user' },
+  favorite: {
+    type: Boolean,
+    default: false,
   }
 }, {
   versionKey: false,

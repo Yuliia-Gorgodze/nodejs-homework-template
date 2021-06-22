@@ -3,6 +3,7 @@ const Contacts = require('../repositories/contacts')
 const listContacts = async (req, res, next) => {
   try {
     const userId = req.user.id
+
     const { docs: result, ...rest } = await Contacts.listContacts(userId, req.query)
     return res.json({ status: 'succes', code: 200, data: { result, ...rest } })
   } catch (e) {
@@ -25,14 +26,12 @@ const getContactById = async (req, res, next) => {
 const addContact = async (req, res, next) => {
   try {
     const userId = req.user.id
-    console.log(userId)
-    console.log(req.body)
+
     const result = await Contacts.addContact(userId, req.body)
     res.status(201).json({ status: 'succes', code: 201, data: { result } })
   } catch (e) {
     if (e.name === 'ValidationError') {
       e.status = 400
-      console.log('ложимся')
     }
     next(e)
   }
