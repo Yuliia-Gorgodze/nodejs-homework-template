@@ -3,7 +3,7 @@ const { HttpCode } = require('../helpers/constants')
 const jwt = require('jsonwebtoken')
 const path = require('path')
 const fs = require('fs/promises')
-const UploadAvatarService = require('../servises/local-upload')
+const UploadAvatarService = require('../services/local-upload')
 require('dotenv').config()
 const SECRET_KEY = process.env.SECRET_KEY
 
@@ -55,39 +55,38 @@ const logout = async (req, res, next) => {
 }
 
 /* local upload */
+
 const avatars = async (req, res, next) => {
   try {
+    if (!req.user?.token) {
+      return res.status(HttpCode.UNAUTHORIZED).json({
+        status: 'error',
+        code: HttpCode.UNAUTHORIZED,
+        message: 'Not authorized',
+      })
+    };
+
     const id = req.user.id
     const uploads = new UploadAvatarService(process.env.AVATAR_OF_USERS)
-    const avatarUrl = await uploads.saveAvatar({ idUser: id, file: req.file })
-
+    const avatarURL = await uploads.saveAvatar({ idUser: id, file: req.file })
+    console.log(avatarURL)
     try {
       await fs.unlink(path.join(process.env.AVATAR_OF_USERS, req.user.avatar))
     } catch (e) {
       console.log(e.message)
-    }
-    await Users.updateAvatar(id, avatarUrl)
-      .res.json({ status: 'succes', code: 200, data: { avatarUrl } })
+    };
+
+    await Users.updateAvatar(id, avatarURL)
+    res.status(HttpCode.OK).json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: { avatarURL }
+    })
   } catch (error) {
     next(error)
-  }
+  };
 }
-// const avatars = async (req, res, next) => {
-//   try {
-//     const id = req.user.id
-//     const uploads = new UploadAvatarService()
-//     const { idCloudAvatar, avatarUrl } =
-//      await uploads.saveAvatar(
-//        req.file.path,
-//        req.user.idCloudAvatar,)
 
-//     await fs.unlink(req.file.path)
-//     await Users.updateAvatar(id, avatarUrl, idCloudAvatar)
-//       .res.json({ status: 'succes', code: 200, data: { avatarUrl } })
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 const current = async (req, res, next) => {
   try {
     const { email, subscription, name } = req.user
