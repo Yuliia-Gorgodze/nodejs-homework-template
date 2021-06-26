@@ -16,7 +16,8 @@ class UploadSrvice {
   }
 
   async saveAvatar(pathFile, oldIdCloudAvatar) {
-    const { public_id: idCloudAvatar, secure_url: avatar } = await uploadCloud(pathFile, {
+    const { public_id: idCloudAvatar, secure_url: avatar } =
+     await uploadCloud(pathFile, {
       public_id: oldIdCloudAvatar?.replace('CloudAvatar/', ''),
       folder: 'CloudAvatar',
       transformation: { width: 250, height: 250, crop: 'pad' }

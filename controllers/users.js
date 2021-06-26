@@ -1,7 +1,7 @@
 const Users = require('../repositories/users')
 const { HttpCode } = require('../helpers/constants')
 const jwt = require('jsonwebtoken')
-const path = require('path')
+// const path = require('path')
 const fs = require('fs/promises')
 // Local upload ==========
 // const UploadAvatarService = require('../services/local-upload')
